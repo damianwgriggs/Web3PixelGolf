@@ -2,6 +2,7 @@
     // --- Setup ---
     let canvas;
     let ctx;
+    let isLoopRunning = false; // Guard against multiple loops
 
     // --- Physics & Game Constants ---
     const GRAVITY = 0.5; // A bit softer for a pixel game
@@ -53,7 +54,10 @@
             gameState.totalScore = 0;
             
             startNewHole();
-            gameLoop(); // Start the main loop
+            if (!isLoopRunning) {
+                isLoopRunning = true;
+                gameLoop(); // Start the main loop
+            }
         },
 
         /**
@@ -129,6 +133,7 @@
      * The main game loop, called by requestAnimationFrame.
      */
     function gameLoop() {
+        if (!isLoopRunning) return; // Check the guard
         update();
         draw();
         requestAnimationFrame(gameLoop);
@@ -153,10 +158,17 @@
         // --- Collision Detection ---
         handleCollisions();
 
+        // --- Apply Ground Friction ---
+        // If the ball is on the ground and has stopped bouncing, apply friction
+        const isOnGround = ball.y + ball.radius >= canvas.height - GROUND_HEIGHT;
+        if (isOnGround && ball.vy === 0) {
+            ball.vx *= FRICTION;
+        }
+
         // --- Check Win Condition ---
         const distToHole = Math.hypot(ball.x - hole.x, ball.y - hole.y);
         // Ball must be on the ground and slow
-        const isOnGround = ball.y + ball.radius >= canvas.height - GROUND_HEIGHT;
+        // const isOnGround = ball.y + ball.radius >= canvas.height - GROUND_HEIGHT; // Already defined
         const isSlowEnough = Math.abs(ball.vx) < 1.5;
 
         if (isOnGround && distToHole < hole.radius && isSlowEnough) {
@@ -180,12 +192,12 @@
 
         // --- Check Stop Condition ---
         // Check if ball is on the ground and moving very slowly
-        const stopOnGround = ball.y + ball.radius >= canvas.height - GROUND_HEIGHT;
+        // const stopOnGround = ball.y + ball.radius >= canvas.height - GROUND_HEIGHT; // Use isOnGround
         
         // Stricter check for vy (it must be 0), but lenient for vx
         const isStopped = Math.abs(ball.vx) < 0.1 && ball.vy === 0;
 
-        if (stopOnGround && isStopped) {
+        if (isOnGround && isStopped) {
             ball.vx = 0;
             ball.y = canvas.height - GROUND_HEIGHT - ball.radius; // Snap to ground
             gameState.isBallMoving = false;
@@ -212,7 +224,7 @@
             }
             // --- END FIX ---
 
-            ball.vx *= FRICTION; // Apply ground friction
+            // ball.vx *= FRICTION; // <-- REMOVED FROM HERE
         }
 
         // 2. Wall Collisions (Left/Right)
@@ -321,3 +333,4 @@
     window.pixelGolf = pixelGolf;
 
 })();
+
