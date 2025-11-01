@@ -23,7 +23,7 @@
     let hole = {
         x: 0,
         y: 0,
-        radius: 8
+        radius: 11 // <-- Increased from 8 to 11
     };
 
     let obstacles = []; // Array of {x, y, width, height}
@@ -337,5 +337,6 @@
     window.pixelGolf = pixelGolf;
 
 })();
+
 
 
