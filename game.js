@@ -141,8 +141,10 @@
         if (!gameState.isBallMoving) return;
 
         // --- Physics ---
-        // 1. Apply Gravity
-        ball.vy += GRAVITY;
+        // 1. Apply Gravity (only if not on the ground)
+        if (ball.y + ball.radius < canvas.height - GROUND_HEIGHT || ball.vy < 0) {
+             ball.vy += GRAVITY;
+        }
 
         // 2. Update Position
         ball.x += ball.vx;
@@ -153,9 +155,11 @@
 
         // --- Check Win Condition ---
         const distToHole = Math.hypot(ball.x - hole.x, ball.y - hole.y);
-        const isSlowEnough = Math.abs(ball.vx) < 1.5 && Math.abs(ball.vy) < 1.5;
+        // Ball must be on the ground and slow
+        const isOnGround = ball.y + ball.radius >= canvas.height - GROUND_HEIGHT;
+        const isSlowEnough = Math.abs(ball.vx) < 1.5;
 
-        if (distToHole < hole.radius && isSlowEnough) {
+        if (isOnGround && distToHole < hole.radius && isSlowEnough) {
             // --- HOLE IN! ---
             gameState.isBallMoving = false;
             ball.vx = 0;
@@ -176,12 +180,13 @@
 
         // --- Check Stop Condition ---
         // Check if ball is on the ground and moving very slowly
-        const isOnGround = ball.y + ball.radius >= canvas.height - GROUND_HEIGHT;
-        const isStopped = Math.abs(ball.vx) < 0.1 && Math.abs(ball.vy) < 0.1;
+        const stopOnGround = ball.y + ball.radius >= canvas.height - GROUND_HEIGHT;
+        
+        // Stricter check for vy (it must be 0), but lenient for vx
+        const isStopped = Math.abs(ball.vx) < 0.1 && ball.vy === 0;
 
-        if (isOnGround && isStopped) {
+        if (stopOnGround && isStopped) {
             ball.vx = 0;
-            ball.vy = 0;
             ball.y = canvas.height - GROUND_HEIGHT - ball.radius; // Snap to ground
             gameState.isBallMoving = false;
             
@@ -197,7 +202,16 @@
         // 1. Ground Collision
         if (ball.y + ball.radius > canvas.height - GROUND_HEIGHT) {
             ball.y = canvas.height - GROUND_HEIGHT - ball.radius; // Snap
-            ball.vy *= BOUNCE; // Bounce
+
+            // --- THIS IS THE FIX ---
+            // If the bounce is very small, just kill vertical velocity to stop jitter
+            if (Math.abs(ball.vy) < 1.0) {
+                ball.vy = 0;
+            } else {
+                ball.vy *= BOUNCE; // Bounce
+            }
+            // --- END FIX ---
+
             ball.vx *= FRICTION; // Apply ground friction
         }
 
