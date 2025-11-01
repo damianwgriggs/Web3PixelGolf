@@ -166,12 +166,16 @@
         }
 
         // --- Check Win Condition ---
-        const distToHole = Math.hypot(ball.x - hole.x, ball.y - hole.y);
+        // const distToHole = Math.hypot(ball.x - hole.x, ball.y - hole.y); // <-- BUG: This check fails because ball.y and hole.y are different
+        const horizontalDistToHole = Math.abs(ball.x - hole.x);
+        
         // Ball must be on the ground and slow
         // const isOnGround = ball.y + ball.radius >= canvas.height - GROUND_HEIGHT; // Already defined
         const isSlowEnough = Math.abs(ball.vx) < 1.5;
 
-        if (isOnGround && distToHole < hole.radius && isSlowEnough) {
+        // --- UPDATED WIN CONDITION ---
+        // Check if ball is on the ground, horizontally aligned with the hole, and moving slowly.
+        if (isOnGround && horizontalDistToHole < hole.radius && isSlowEnough) {
             // --- HOLE IN! ---
             gameState.isBallMoving = false;
             ball.vx = 0;
@@ -333,4 +337,5 @@
     window.pixelGolf = pixelGolf;
 
 })();
+
 
