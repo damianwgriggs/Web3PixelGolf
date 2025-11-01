@@ -119,14 +119,16 @@
                     <button id="launchBtn" class="w-full py-3 px-4 rounded-lg font-semibold text-lg text-white btn-primary self-end">LAUNCH</button>
                 </div>
 
-                <!-- 4. End Game Screen (Hidden) -->
-                <div id="endGameContainer" class="hidden text-center space-y-4 bg-gray-900/60 rounded-lg p-6">
-                    <h2 class="text-3xl font-bold text-white">Course Complete!</h2>
-                    <p class="text-xl text-gray-300">Final Total Score: <span id="finalScoreDisplay" class="font-bold text-green-400">0</span></p>
-                    <p class="text-gray-400">Submit your score to the leaderboard. (This is a placeholder for now).</p>
-                    <button id="submitScoreBtn" class="w-full max-w-sm mx-auto py-3 px-4 rounded-lg font-semibold text-lg text-white btn-secondary">Submit Score</button>
-                </div>
-            </section>
+            </section> <!-- <-- *** MOVED endGameContainer OUTSIDE of this section *** -->
+
+            <!-- 4. End Game Screen (Hidden) -->
+            <div id="endGameContainer" class="hidden text-center space-y-4 bg-gray-900/60 rounded-lg p-6">
+                <h2 class="text-3xl font-bold text-white">Course Complete!</h2>
+                <p class="text-xl text-gray-300">Final Total Score: <span id="finalScoreDisplay" class="font-bold text-green-400">0</span></p>
+                <p class="text-gray-400">Submit your score to the leaderboard. (This is a placeholder for now).</p>
+                <button id="submitScoreBtn" class="w-full max-w-sm mx-auto py-3 px-4 rounded-lg font-semibold text-lg text-white btn-secondary">Submit Score</button>
+            </div>
+            
         </main>
         
         <footer id="messageArea" class="mt-4 text-center min-h-[24px]">
@@ -902,10 +904,12 @@
             setTimeout(() => {
                 endGameContainer.classList.add('hidden');
                 gameContainer.classList.remove('hidden');
-                gameInterface.updateScoreboard(1, 0, 0); // Reset UI
-                if (window.pixelGolf) window.pixelGolf.init(gameCanvas); // Re-init game
+                // We need to re-initialize the game engine for a new round
+                if (window.pixelGolf && typeof window.pixelGolf.init === 'function') {
+                    window.pixelGolf.init(gameCanvas); 
+                }
+                // The game's init function will call updateScoreboard and endTurn
                 setLoading(false, [submitScoreBtn]);
-                gameInterface.endTurn(); // Re-enable controls
             }, 3000);
         }
 
@@ -1025,3 +1029,4 @@
     </script>
 </body>
 </html>
+
