@@ -142,10 +142,10 @@
     <script>
         // --- Configuration ---
         
-        // --- NEW CONTRACT ADDRESS ---
-        const contractAddress = "0x07b0Ef93fB68Ab8b21A7c81a8592101E0Bf00aa1";
+        // --- NEW MAINNET CONTRACT ADDRESS ---
+        const contractAddress = "0x5C8660D8C8291Ffd5f62082e6986388A4AF66B81";
         
-        // --- NEW ABI ---
+        // --- NEW MAINNET ABI ---
         const contractABI = [
             {
                 "inputs": [
@@ -646,9 +646,9 @@
             }
         ];
         
-        // --- UPDATED FOR FUJI TESTNET ---
-        const avaxChainId = '0xa869'; // 43113 in decimal for Fuji
-        const avaxExplorerUrl = 'https://testnet.snowtrace.io';
+        // --- UPDATED FOR MAINNET ---
+        const avaxChainId = '0xa86a'; // 43114 in decimal for Mainnet
+        const avaxExplorerUrl = 'https://snowtrace.io';
         const mintPriceHex = '0x16345785D8A0000'; // 0.1 AVAX in Hex Wei
 
         // --- DOM Elements ---
@@ -731,7 +731,7 @@
                 }
             } catch (switchError) {
                 if (switchError.code === 4902) { await addAvaxNetwork(); }
-                else { showMessage('Please switch to Avalanche Fuji Testnet in MetaMask.', 'error'); }
+                else { showMessage('Please switch to Avalanche C-Chain in MetaMask.', 'error'); }
             }
         }
 
@@ -740,14 +740,14 @@
                 await window.ethereum.request({
                     method: 'wallet_addEthereumChain',
                     params: [{
-                        chainId: avaxChainId, // Fuji ID
-                        chainName: 'Avalanche Fuji C-Chain', // Fuji Name
+                        chainId: avaxChainId, // Mainnet ID
+                        chainName: 'Avalanche C-Chain', // Mainnet Name
                         nativeCurrency: { name: 'AVAX', symbol: 'AVAX', decimals: 18 },
-                        rpcUrls: ['https://api.avax-test.network/ext/bc/C/rpc'], // Fuji RPC
-                        blockExplorerUrls: [avaxExplorerUrl] // Fuji Explorer
+                        rpcUrls: ['https://api.avax.network/ext/bc/C/rpc'], // Mainnet RPC
+                        blockExplorerUrls: [avaxExplorerUrl] // Mainnet Explorer
                     }],
                 });
-            } catch (addError) { showMessage('Could not add Avalanche Fuji network.', 'error'); }
+            } catch (addError) { showMessage('Could not add Avalanche C-Chain network.', 'error'); }
         }
 
         // --- Game Interaction Logic ---
@@ -776,7 +776,7 @@
                 }
             } catch (e) {
                 console.error("Error checking mint status:", e);
-                showMessage('Could not check mint status. Using Fuji Testnet?', 'error');
+                showMessage('Could not check mint status. Are you on Mainnet?', 'error');
             }
         }
 
